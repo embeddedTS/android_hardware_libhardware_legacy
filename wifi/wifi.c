@@ -137,35 +137,26 @@ static int insmod(const char *filename, const char *args)
     void *module;
     unsigned int size;
     int ret;
+    static int loaded = -1;
+    if(loaded == -1) {
+        module = load_file(filename, &size);
+        if (!module)
+            return -1;
 
-    module = load_file(filename, &size);
-    if (!module)
-        return -1;
+        ret = init_module(module, size, args);
 
-    ret = init_module(module, size, args);
+        free(module);
+        loaded = 0;
+	system("su ifconfig wlan0 up");
+        return ret;
+    }
 
-    free(module);
-
-    return ret;
+    return 0;
 }
 
 static int rmmod(const char *modname)
 {
-    int ret = -1;
-    int maxtry = 10;
-
-    while (maxtry-- > 0) {
-        ret = delete_module(modname, O_NONBLOCK | O_EXCL);
-        if (ret < 0 && errno == EAGAIN)
-            usleep(500000);
-        else
-            break;
-    }
-
-    if (ret != 0)
-        ALOGD("Unable to unload driver module \"%s\": %s\n",
-             modname, strerror(errno));
-    return ret;
+    return 0;
 }
 
 int do_dhcp_request(int *ipaddr, int *gateway, int *mask,
