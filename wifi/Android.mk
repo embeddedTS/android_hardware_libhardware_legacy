@@ -46,6 +46,13 @@ else
   LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../external/wpa_supplicant_8/src/common
 endif
 
+ifeq ($(BOARD_WLAN_VENDOR),TI)
+  LOCAL_CFLAGS += -DWIFI_TI
+  LOCAL_STATIC_LIBRARIES := libnl
+  LOCAL_C_INCLUDES += external/libnl/include
+  LOCAL_C_INCLUDES += hardware/ti/wlan/mac80211/wpa_supplicant_8_lib
+endif
+
 ifdef WPA_SUPPLICANT_VERSION
 LOCAL_CFLAGS += -DLIBWPA_CLIENT_EXISTS
 LOCAL_SHARED_LIBRARIES += libwpa_client
